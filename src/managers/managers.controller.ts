@@ -31,6 +31,10 @@ export class ManagersController {
   getManagerByEmail(@Query('email') email: string): object {
     return this.ManagersService.getManagerByEmail(email);
   }
+  @Get('by-phone')
+  getManagerByPhone(@Query('phone') phone: string): object {
+    return this.ManagersService.getManagerByPhone(phone);
+  }
   @Put(':email')
   updateManager(
     @Param('email') email: string,

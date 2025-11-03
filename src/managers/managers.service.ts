@@ -28,14 +28,20 @@ const managers: ManagerDto[] = [
 
 @Injectable()
 export class ManagersService {
-  getManagers(): object {
-    return {
-      success: true,
-      data: managers,
-    };
+  getManagers(): ManagerDto[] {
+    return managers;
   }
   getManagerByEmail(email: string): ManagerDto | object {
     const manager = managers.find((manager) => manager.email === email);
+    if (!manager) {
+      return {
+        message: 'Manager not found',
+      };
+    }
+    return manager;
+  }
+  getManagerByPhone(phone: string): ManagerDto | object {
+    const manager = managers.find((manager) => manager.phoneNumber === phone);
     if (!manager) {
       return {
         message: 'Manager not found',
