@@ -8,6 +8,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -32,6 +33,13 @@ export class ManagersController {
   }
   @Put(':email')
   updateManager(
+    @Param('email') email: string,
+    @Body() data: ManagerDto,
+  ): object {
+    return this.ManagersService.update(email, data);
+  }
+  @Patch(':email')
+  patchUpdateManager(
     @Param('email') email: string,
     @Body() data: ManagerDto,
   ): object {
