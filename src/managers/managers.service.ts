@@ -49,9 +49,15 @@ export class ManagersService {
     }
     return manager;
   }
-  create(data: ManagerDto): object {
-    managers.push(data);
-    return data;
+  create(data: ManagerDto, fileName: string): object {
+    managers.push({
+      ...data,
+      file: fileName,
+    });
+    return {
+      ...data,
+      file: fileName,
+    };
   }
   update(email: string, data: ManagerDto): object {
     const index = managers.findIndex((manager) => manager.email === email);
@@ -61,7 +67,10 @@ export class ManagersService {
       };
     }
     managers[index] = data;
-    return data;
+    return {
+      email: data.email,
+      firstName: data.firstName,
+    };
   }
   delete(email: string): object {
     return {
