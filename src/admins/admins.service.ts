@@ -1,19 +1,18 @@
-/*
-https://docs.nestjs.com/providers#services
-*/
+
 
 import { Injectable } from '@nestjs/common';
 import { AdminsDto} from './admins.dto';
 
 const admins: AdminsDto[] = [
-  {
-    firstName: 'John',
+   {
+     firstName: 'John',
     lastName: 'Doe',
-    email: 'john.doe@example.com',
+     email: 'john.doe@example.com',
     phoneNumber: '1234567890',
     password: 'password123',
     gender: 'male',
     dateOfBirth: '1990-01-01',
+    socialMediaURL: ''
   },
   {
     firstName: 'Jane',
@@ -22,16 +21,31 @@ const admins: AdminsDto[] = [
     phoneNumber: '0987654321',
     password: 'password456',
     gender: 'female',
-    dateOfBirth: '1992-02-02',
+   dateOfBirth: '1992-02-02',
+    socialMediaURL: ''
   },
 ];
 
 @Injectable()
 export class AdminService {
+  partialUpdate(email: string, data: Partial<AdminsDto>): object {
+    const index = admins.findIndex((a) => a.email === email);
+    if (index === -1) {
+      return {
+        message: 'Admin not found',
+      };
+    }
+    // Merge existing admin with provided partial data
+    const updated = { ...admins[index], ...data } as AdminsDto;
+    admins[index] = updated;
+    return updated;
+  }
   getAdmins(): object {
     return {
       success: true,
-      data: admins,
+      data: admins.map((admin) => (
+        {email: admin.email, socialMediaURL: admin.socialMediaURL }
+      )),
     };
   }
   getAdminByEmail(email: string): AdminsDto | object {
@@ -45,7 +59,10 @@ export class AdminService {
   }
   create(data: AdminsDto): object {
     admins.push(data);
-    return data;
+    return { data,
+      message: 'Admin created successfully',
+    };
+
   }
   update(email: string, data: AdminsDto): object {
     const index = admins.findIndex((a) => a.email === email);
@@ -62,4 +79,6 @@ export class AdminService {
       message: `Admin with email ${email} deleted successfully`,
     };
   }
+
+
 }

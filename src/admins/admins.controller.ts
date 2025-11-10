@@ -11,11 +11,15 @@ import {
   Post,
   Put,
   Query,
+  Patch,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AdminService } from './admins.service';
 import { AdminsDto } from './admins.dto';
 
 @Controller('admins')
+@UsePipes(ValidationPipe)
 export class AdminsController {
   constructor(private readonly adminService: AdminService) {}
   @Post()
@@ -40,5 +44,12 @@ export class AdminsController {
   @Delete(':email')
   deleteAdmin(@Param('email') email: string): object {
     return this.adminService.delete(email);
+  }
+  @Patch(':email')
+  partialUpdateAdmin(
+    @Param('email') email: string,
+    @Body() data: Partial<AdminsDto>,
+  ): object {
+    return this.adminService.partialUpdate(email, data);
   }
 }
