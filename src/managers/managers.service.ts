@@ -28,11 +28,8 @@ const managers: ManagerDto[] = [
 
 @Injectable()
 export class ManagersService {
-  getManagers(): object {
-    return {
-      success: true,
-      data: managers,
-    };
+  getManagers(): ManagerDto[] {
+    return managers;
   }
   getManagerByEmail(email: string): ManagerDto | object {
     const manager = managers.find((manager) => manager.email === email);
@@ -43,9 +40,24 @@ export class ManagersService {
     }
     return manager;
   }
-  create(data: ManagerDto): object {
-    managers.push(data);
-    return data;
+  getManagerByPhone(phone: string): ManagerDto | object {
+    const manager = managers.find((manager) => manager.phoneNumber === phone);
+    if (!manager) {
+      return {
+        message: 'Manager not found',
+      };
+    }
+    return manager;
+  }
+  create(data: ManagerDto, fileName: string): object {
+    managers.push({
+      ...data,
+      file: fileName,
+    });
+    return {
+      ...data,
+      file: fileName,
+    };
   }
   update(email: string, data: ManagerDto): object {
     const index = managers.findIndex((manager) => manager.email === email);
@@ -55,7 +67,10 @@ export class ManagersService {
       };
     }
     managers[index] = data;
-    return data;
+    return {
+      email: data.email,
+      firstName: data.firstName,
+    };
   }
   delete(email: string): object {
     return {
