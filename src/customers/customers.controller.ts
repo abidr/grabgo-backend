@@ -4,7 +4,6 @@ import { CustomerDto } from './customers.dto';
 
 
 @Controller('customers')
-@UsePipes(new ValidationPipe())
 export class CustomersController {
   constructor (private readonly customersService: CustomersService) {}
 
@@ -19,6 +18,7 @@ export class CustomersController {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe())
   createCustomer(@Body() customerData: CustomerDto): object{
     return this.customersService.createCustomer(customerData);
   }

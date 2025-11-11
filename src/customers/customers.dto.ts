@@ -1,4 +1,4 @@
-import { IsAlpha, IsEmail, IsIn, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
+import { IsAlpha, IsEmail, IsIn, IsNotEmpty, IsPhoneNumber, IsString, Matches, MinLength } from 'class-validator';
 
 export class CustomerDto{
   // @IsAlpha()
@@ -26,6 +26,8 @@ export class CustomerDto{
     gender: 'male' | 'female';
   
     @IsNotEmpty()
+    
+    @IsPhoneNumber('BD')
     @Matches(/^\d+$/, { message: 'Phone number must contain only numbers' })
     phoneNumber: string;
 
