@@ -1,9 +1,10 @@
-import { Controller, Body, Delete, Post, Get, Patch, Param, Put, Query} from '@nestjs/common';
+import { Controller, Body, Delete, Post, Get, Patch, Param, Put, Query, ValidationPipe, UsePipes} from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CustomerDto } from './customers.dto';
 
 
 @Controller('customers')
+@UsePipes(new ValidationPipe())
 export class CustomersController {
   constructor (private readonly customersService: CustomersService) {}
 
@@ -25,6 +26,11 @@ export class CustomersController {
   @Put (':email')
   updateCustomer(@Param('email') email: string, @Body() customerData: CustomerDto): object{
     return this.customersService.updateCustomer(email, customerData);
+  }
+
+  @Patch (':email')
+  updateCustomerPartially(@Param('email') email: string, @Body() partialData: Partial<CustomerDto>): object {
+    return this.customersService.updateCustomerPartially(email, partialData);
   }
 
   @Delete (':email')
