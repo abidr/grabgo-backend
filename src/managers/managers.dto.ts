@@ -3,6 +3,7 @@ import {
   IsDateString,
   IsEmail,
   IsIn,
+  IsString,
   Length,
   MinLength,
   Validate,
@@ -41,6 +42,12 @@ export class ManagerDto {
 
   @IsDateString()
   dateOfBirth: string;
+
+  @IsString()
+  age: string;
+
+  @IsIn(['active', 'inactive'])
+  status: 'active' | 'inactive';
 
   file?: string;
 }

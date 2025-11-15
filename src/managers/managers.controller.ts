@@ -62,6 +62,14 @@ export class ManagersController {
   getManagerByPhone(@Query('phone') phone: string): object {
     return this.ManagersService.getManagerByPhone(phone);
   }
+  @Get('inactive')
+  getInactiveManagers(): object {
+    return this.ManagersService.getInactiveManagers();
+  }
+  @Get('older-than/:age')
+  getManagersOlderThan(@Param('age') age: number): object {
+    return this.ManagersService.getManagersOlderThan(age);
+  }
   @Put(':email')
   updateManager(
     @Param('email') email: string,

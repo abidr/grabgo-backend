@@ -2,34 +2,32 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ManagerDto } from './managers.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ManagerEntity } from './managers.entity';
+import { MoreThan, Repository, TypeORMError } from 'typeorm';
 
-const managers: ManagerDto[] = [
-  {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phoneNumber: '1234567890',
-    password: 'password123',
-    gender: 'male',
-    dateOfBirth: '1990-01-01',
-  },
-  {
-    firstName: 'Jane',
-    lastName: 'Doe',
-    email: 'jane.doe@example.com',
-    phoneNumber: '0987654321',
-    password: 'password456',
-    gender: 'female',
-    dateOfBirth: '1992-02-02',
-  },
-];
+const managers: ManagerDto[] = [];
 
 @Injectable()
 export class ManagersService {
+  constructor(
+    @InjectRepository(ManagerEntity)
+    private managerRepository: Repository<ManagerEntity>,
+  ) {}
   getManagers(): ManagerDto[] {
     return managers;
+  }
+  async getInactiveManagers(): Promise<ManagerEntity[]> {
+    return this.managerRepository.find({ where: { status: 'inactive' } });
+  }
+  async getManagersOlderThan(age: number): Promise<ManagerEntity[]> {
+    return this.managerRepository.find({
+      where: {
+        age: MoreThan(age),
+      },
+    });
   }
   getManagerByEmail(email: string): ManagerDto | object {
     const manager = managers.find((manager) => manager.email === email);
@@ -49,28 +47,41 @@ export class ManagersService {
     }
     return manager;
   }
-  create(data: ManagerDto, fileName: string): object {
-    managers.push({
-      ...data,
-      file: fileName,
-    });
-    return {
-      ...data,
-      file: fileName,
-    };
-  }
-  update(email: string, data: ManagerDto): object {
-    const index = managers.findIndex((manager) => manager.email === email);
-    if (index === -1) {
-      return {
-        message: 'Manager not found',
-      };
+  async create(data: ManagerDto, fileName: string): Promise<object> {
+    try {
+      return await this.managerRepository.save({
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+        gender: data.gender,
+        age: parseInt(data.age, 10),
+        file: fileName,
+      });
+    } catch (error) {
+      if (error instanceof TypeORMError) {
+        throw new HttpException(error.message, 400);
+      } else {
+        throw new HttpException('Internal Server Error', 500);
+      }
     }
-    managers[index] = data;
-    return {
-      email: data.email,
-      firstName: data.firstName,
-    };
+  }
+  async update(email: string, data: ManagerDto): Promise<object> {
+    try {
+      await this.managerRepository.update(
+        { email },
+        {
+          status: data.status,
+        },
+      );
+      return await this.managerRepository.findOneOrFail({ where: { email } });
+    } catch (error) {
+      if (error instanceof TypeORMError) {
+        throw new HttpException(error.message, 400);
+      } else {
+        throw new HttpException('Internal Server Error', 500);
+      }
+    }
   }
   delete(email: string): object {
     return {
