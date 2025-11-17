@@ -11,16 +11,9 @@ export class User2Dto {
   email: string;
 
   @IsNotEmpty()
-  @IsString()
-  @MinLength(6)
-  @Matches(/[A-Z]/, { message: 'Password must contain at least one uppercase letter' })
-  password: string;
-
-  @IsNotEmpty()
   @IsIn(['male', 'female'])
   gender: 'male' | 'female';
 
-  @IsNotEmpty()
-  @Matches(/^\d+$/, { message: 'Phone number must contain only numbers' })
-  phoneNumber: string;
+  file: string;
+
 }

@@ -13,9 +13,12 @@ export class User2Service {
     return users.find(u => u.email === email) ?? { message: 'User not found' };
   }
 
-  create(data: User2Dto) {
-    users.push(data);
-    return data;
+  create(data: User2Dto, filename: string) {
+    users.push({
+      ...data,
+      file: filename,
+    });
+    return {...data, file: filename};
   }
 
   update(email: string, data: User2Dto) {

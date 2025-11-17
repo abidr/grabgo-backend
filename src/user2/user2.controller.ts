@@ -2,7 +2,8 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseInter
 import { User2Service } from './user2.service';
 import { User2Dto } from './user2.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileUploadValidationPipe } from '../common/pipes/file-upload.pipe';
+// import { FileUploadValidationPipe } from '../common/pipes/file-upload.pipe';
+import { diskStorage, MulterError } from 'multer';
 
 @Controller('user2')
 @UsePipes(new ValidationPipe())
@@ -16,15 +17,28 @@ export class User2Controller {
   getByEmail(@Query('email') email: string) { return this.user.getByEmail(email); }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  create(
-    @Body() data: User2Dto,
-    @UploadedFile(
-      new FileUploadValidationPipe({ maxSize: 1_000_000, allowedMimeTypes: ['image/jpeg', 'image/png'] }),
-    ) file: Express.Multer.File,
-  ) {
-    // file has been validated by the pipe; service currently stores only DTO data
-    return this.user.create(data);
+  @UsePipes(new ValidationPipe())
+   @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/^.*\.(jpg|webp|png|jpeg)$/)) {
+          cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'file'), false);
+        } else {
+          cb(null, true);
+        }
+      },
+        storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          cb(null, `${Date.now()}-${file.originalname}`);
+        },
+      }),
+    }),
+  )
+ 
+ create(@Body() data: User2Dto, @UploadedFile() file: Express.Multer.File) :object{
+    console.log('Uploaded file:', file);
+    return this.user.create(data, file.filename);
   }
 
   @Put(':email')

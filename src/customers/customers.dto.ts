@@ -1,4 +1,4 @@
-import { IsAlpha, IsEmail, IsIn, IsNotEmpty, IsPhoneNumber, IsString, Matches, MinLength } from 'class-validator';
+import { IsAlpha, IsEmail, IsIn, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Matches, MinLength } from 'class-validator';
 
 export class CustomerDto{
   // @IsAlpha()
@@ -10,11 +10,14 @@ export class CustomerDto{
   // address: string;
   // password: string;
 
+
   @IsNotEmpty()
     @IsEmail()
     @Matches(/@aiub\.edu$/i, { message: 'Email must be in aiub.edu domain' })
     email: string;
-  
+
+    @IsOptional()
+    fullName: string | null;
     @IsNotEmpty()
     @IsString()
     @MinLength(6)
@@ -25,8 +28,7 @@ export class CustomerDto{
     @IsIn(['male', 'female'])
     gender: 'male' | 'female';
   
-    @IsNotEmpty()
-    
+    @IsNotEmpty() 
     @IsPhoneNumber('BD')
     @Matches(/^\d+$/, { message: 'Phone number must contain only numbers' })
     phoneNumber: string;

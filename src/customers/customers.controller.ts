@@ -9,7 +9,12 @@ export class CustomersController {
 
   @Get()
   getAllCustomers(): object{
-    return this.customersService.getAllCustomers();
+    return this.customersService.getAllCustomer();
+  }
+
+   @Get('null-customers')
+    getNullCustomer(): object{
+    return this.customersService.getNullCustomer();
   }
 
   @Get('by-email')
@@ -24,18 +29,18 @@ export class CustomersController {
   }
 
   @Put (':email')
-  updateCustomer(@Param('email') email: string, @Body() customerData: CustomerDto): object{
+  async updateCustomer(@Param('email') email: string, @Body() customerData: CustomerDto): Promise<object | null> {
     return this.customersService.updateCustomer(email, customerData);
   }
 
-  @Patch (':email')
-  updateCustomerPartially(@Param('email') email: string, @Body() partialData: Partial<CustomerDto>): object {
-    return this.customersService.updateCustomerPartially(email, partialData);
-  }
+  // @Patch (':email')
+  // updateCustomerPartially(@Param('email') email: string, @Body() partialData: Partial<CustomerDto>): object {
+  //   return this.customersService.updateCustomerPartially(email, partialData);
+  // }
 
-  @Delete (':email')
-  deleteCustomer(@Param('email') email: string): object {
-    return this.customersService.deleteCustomer(email);
+  @Delete (':id')
+  deleteCustomer(@Param('id') id: string): object {
+    return this.customersService.deleteCustomer(id);
   }
 
 }
