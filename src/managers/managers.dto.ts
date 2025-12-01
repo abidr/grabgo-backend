@@ -51,3 +51,11 @@ export class ManagerDto {
 
   file?: string;
 }
+
+export class ManagerSignInDto {
+  @IsEmail()
+  email: string;
+
+  @MinLength(6)
+  password: string;
+}

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /*
 https://docs.nestjs.com/controllers#controllers
 */
@@ -13,14 +16,17 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
+  Request,
 } from '@nestjs/common';
 import { ManagersService } from './managers.service';
-import { ManagerDto } from './managers.dto';
+import { ManagerDto, ManagerSignInDto } from './managers.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage, MulterError } from 'multer';
+import { AuthGuard } from './auth.guard';
 
 @Controller('managers')
 export class ManagersController {
@@ -49,6 +55,16 @@ export class ManagersController {
     @UploadedFile() file: Express.Multer.File,
   ): object {
     return this.ManagersService.create(data, file.filename);
+  }
+  @Post('sign-in')
+  @UsePipes(new ValidationPipe())
+  signIn(@Body() data: ManagerSignInDto): object {
+    return this.ManagersService.signIn(data);
+  }
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Request() req: Request): object {
+    return (req as any)?.user;
   }
   @Get()
   getManagers(): object {
@@ -84,8 +100,19 @@ export class ManagersController {
   ): object {
     return this.ManagersService.update(email, data);
   }
-  @Delete(':email')
-  deleteManager(@Param('email') email: string): object {
-    return this.ManagersService.delete(email);
+  @Post('subscribe/:subscriptionId')
+  @UseGuards(AuthGuard)
+  subscribeManager(
+    @Param('subscriptionId') subscriptionId: number,
+    @Request() req,
+  ): object {
+    return this.ManagersService.subscribeToSubscription(
+      req.user.id,
+      subscriptionId,
+    );
+  }
+  @Delete()
+  deleteManager(): object {
+    return this.ManagersService.delete();
   }
 }

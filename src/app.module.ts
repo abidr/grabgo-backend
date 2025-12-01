@@ -1,3 +1,5 @@
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
 import { ManagersModule } from './managers/managers.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -6,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    SubscriptionsModule,
+    RestaurantsModule,
     ManagersModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
