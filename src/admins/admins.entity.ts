@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToOne, OneToMany } from "typeorm";
+import { AdminProfile } from './AdminProfile.entity';
+import { MenuItem } from "./MenuItems.entity";
 
 @Entity("admins")
 export class Admin {
@@ -26,6 +28,10 @@ export class Admin {
     joiningDate: Date;
     @Column({type:'varchar', length:30, default:'unknown'})
     country: string;
+    @OneToOne(() => AdminProfile, (profile) => profile.admin)
+    profile: AdminProfile;
+    @OneToMany(() => MenuItem, menuItem => menuItem.admin)
+    MenuItems: MenuItem[];
     @CreateDateColumn()
     createdAt: Date;
 }
