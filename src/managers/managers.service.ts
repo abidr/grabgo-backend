@@ -133,9 +133,9 @@ export class ManagersService {
       manager,
     };
   }
-  delete(): object {
+  delete(managerId: number): object {
     return this.managerRepository.delete({
-      status: 'inactive',
+      id: managerId,
     });
   }
 }

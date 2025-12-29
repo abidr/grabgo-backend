@@ -40,7 +40,9 @@ export class ManagerEntity {
   @Column({ default: 'active', type: 'enum', enum: ['active', 'inactive'] })
   status: 'active' | 'inactive';
 
-  @OneToOne(() => RestaurantEntity, (restaurant) => restaurant.manager)
+  @OneToOne(() => RestaurantEntity, (restaurant) => restaurant.manager, {
+    cascade: true,
+  })
   @JoinColumn()
   restaurant: RestaurantEntity;
 

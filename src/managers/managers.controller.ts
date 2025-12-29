@@ -111,8 +111,8 @@ export class ManagersController {
       subscriptionId,
     );
   }
-  @Delete()
-  deleteManager(): object {
-    return this.ManagersService.delete();
+  @Delete(':id')
+  deleteManager(@Param('id') managerId: number): object {
+    return this.ManagersService.delete(managerId);
   }
 }

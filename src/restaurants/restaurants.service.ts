@@ -39,4 +39,9 @@ export class RestaurantsService {
     });
     return manager.restaurant;
   }
+  async getAllRestaurants(): Promise<object> {
+    return this.restaurantRepository.find({
+      relations: ['manager'],
+    });
+  }
 }

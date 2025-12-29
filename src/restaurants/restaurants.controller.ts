@@ -19,6 +19,10 @@ import { AuthGuard } from 'src/managers/auth.guard';
 @Controller('restaurants')
 export class RestaurantsController {
   constructor(private readonly restaurantsService: RestaurantsService) {}
+  @Get('/all')
+  getAllRestaurants(): object {
+    return this.restaurantsService.getAllRestaurants();
+  }
   @Post()
   @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
