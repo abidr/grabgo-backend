@@ -15,17 +15,14 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
   Request,
+  Response,
 } from '@nestjs/common';
 import { ManagersService } from './managers.service';
 import { ManagerDto, ManagerSignInDto } from './managers.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage, MulterError } from 'multer';
 import { AuthGuard } from './auth.guard';
 
 @Controller('managers')
@@ -33,33 +30,36 @@ export class ManagersController {
   constructor(private readonly ManagersService: ManagersService) {}
   @Post()
   @UsePipes(new ValidationPipe())
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(pdf)$/)) {
-          cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'pdf'), false);
-        } else {
-          cb(null, true);
-        }
-      },
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          cb(null, `${Date.now()}-${file.originalname}`);
-        },
-      }),
-    }),
-  )
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     fileFilter: (req, file, cb) => {
+  //       if (!file.mimetype.match(/\/(pdf)$/)) {
+  //         cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'pdf'), false);
+  //       } else {
+  //         cb(null, true);
+  //       }
+  //     },
+  //     storage: diskStorage({
+  //       destination: './uploads',
+  //       filename: (req, file, cb) => {
+  //         cb(null, `${Date.now()}-${file.originalname}`);
+  //       },
+  //     }),
+  //   }),
+  // )
   createManager(
     @Body() data: ManagerDto,
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
   ): object {
-    return this.ManagersService.create(data, file.filename);
+    return this.ManagersService.create(data);
   }
   @Post('sign-in')
   @UsePipes(new ValidationPipe())
-  signIn(@Body() data: ManagerSignInDto): object {
-    return this.ManagersService.signIn(data);
+  signIn(
+    @Body() data: ManagerSignInDto,
+    @Response({ passthrough: true }) res,
+  ): object {
+    return this.ManagersService.signIn(data, res);
   }
   @UseGuards(AuthGuard)
   @Get('profile')

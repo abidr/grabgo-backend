@@ -34,7 +34,7 @@ export class ManagerEntity {
   @Column({ type: 'int', unsigned: true })
   age: number;
 
-  @Column()
+  @Column({ nullable: true })
   file: string;
 
   @Column({ default: 'active', type: 'enum', enum: ['active', 'inactive'] })

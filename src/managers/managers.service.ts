@@ -10,6 +10,7 @@ import { MoreThan, Repository, TypeORMError } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SubscriptionEntity } from 'src/subscriptions/subscriptions.entity';
+import { Response } from 'express';
 
 @Injectable()
 export class ManagersService {
@@ -53,7 +54,7 @@ export class ManagersService {
     }
     return manager;
   }
-  async signIn(data: ManagerSignInDto): Promise<void | object> {
+  async signIn(data: ManagerSignInDto, res: Response): Promise<void | object> {
     const manager = await this.managerRepository.findOne({
       where: { email: data.email },
     });
@@ -74,11 +75,16 @@ export class ManagersService {
       status: manager.status,
     };
     const accessToken = await this.jwtService.signAsync(payload);
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'strict',
+    });
     return {
       accessToken,
     };
   }
-  async create(data: ManagerDto, fileName: string): Promise<object> {
+  async create(data: ManagerDto): Promise<object> {
     try {
       return await this.managerRepository.save(
         this.managerRepository.create({
@@ -87,8 +93,7 @@ export class ManagersService {
           phoneNumber: data.phoneNumber,
           password: data.password,
           gender: data.gender,
-          age: parseInt(data.age, 10),
-          file: fileName,
+          age: 20,
         }),
       );
     } catch (error) {
