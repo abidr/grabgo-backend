@@ -35,13 +35,48 @@ export class RestaurantsService {
   async getRestaurants(@Request() req): Promise<object> {
     const manager = await this.managerRepository.findOneOrFail({
       where: { id: req.user.id },
-      relations: ['restaurant'],
+      relations: ['restaurants'],
     });
-    return manager.restaurant;
+    return manager.restaurants;
   }
   async getAllRestaurants(): Promise<object> {
     return this.restaurantRepository.find({
       relations: ['manager'],
     });
+  }
+  getRestaurantById(id: number): Promise<object> {
+    return this.restaurantRepository.findOneOrFail({
+      where: { id },
+    });
+  }
+  async deleteRestaurant(id: number): Promise<object> {
+    const restaurant = await this.restaurantRepository.findOne({
+      where: { id },
+    });
+    if (!restaurant) {
+      return {
+        message: 'Restaurant not found',
+      };
+    }
+    await this.restaurantRepository.remove(restaurant);
+    return {
+      message: 'Restaurant deleted successfully',
+    };
+  }
+  async updateRestaurant(id: number, data: RestaurantDto): Promise<object> {
+    const restaurant = await this.restaurantRepository.findOne({
+      where: { id },
+    });
+    if (!restaurant) {
+      return {
+        message: 'Restaurant not found',
+      };
+    }
+    this.restaurantRepository.merge(restaurant, data);
+    await this.restaurantRepository.save(restaurant);
+    return {
+      message: 'Restaurant updated successfully',
+      restaurant,
+    };
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 /*
 https://docs.nestjs.com/controllers#controllers
 */
@@ -61,10 +61,19 @@ export class ManagersController {
   ): object {
     return this.ManagersService.signIn(data, res);
   }
+  @Post('sign-out')
+  signOut(@Response({ passthrough: true }) res): object {
+    return this.ManagersService.signOut(res);
+  }
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req: Request): object {
-    return (req as any)?.user;
+    return this.ManagersService.getProfile((req as any)?.user?.id);
+  }
+  @UseGuards(AuthGuard)
+  @Put('profile')
+  updateProfile(@Request() req: Request, @Body() data: ManagerDto): object {
+    return this.ManagersService.updateProfile(data, (req as any)?.user?.id);
   }
   @Get()
   getManagers(): object {
@@ -81,10 +90,6 @@ export class ManagersController {
   @Get('inactive')
   getInactiveManagers(): object {
     return this.ManagersService.getInactiveManagers();
-  }
-  @Get('older-than/:age')
-  getManagersOlderThan(@Param('age') age: number): object {
-    return this.ManagersService.getManagersOlderThan(age);
   }
   @Put(':email')
   updateManager(

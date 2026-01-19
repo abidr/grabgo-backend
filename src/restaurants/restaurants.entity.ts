@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ManagerEntity } from '../managers/managers.entity';
 
 @Entity('restaurant')
@@ -15,6 +15,6 @@ export class RestaurantEntity {
   @Column()
   phoneNumber: string;
 
-  @OneToOne(() => ManagerEntity, (manager) => manager.restaurant)
+  @ManyToOne(() => ManagerEntity, (manager) => manager.id)
   manager: ManagerEntity;
 }

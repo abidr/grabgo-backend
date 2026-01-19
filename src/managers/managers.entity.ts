@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -16,8 +16,11 @@ export class ManagerEntity {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  fullName: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  lastName: string;
 
   @Column({ unique: true })
   email: string;
@@ -31,8 +34,8 @@ export class ManagerEntity {
   @Column({ type: 'enum', enum: ['male', 'female'] })
   gender: 'male' | 'female';
 
-  @Column({ type: 'int', unsigned: true })
-  age: number;
+  @Column({ type: 'varchar', nullable: true })
+  dateOfBirth: string;
 
   @Column({ nullable: true })
   file: string;
@@ -40,11 +43,11 @@ export class ManagerEntity {
   @Column({ default: 'active', type: 'enum', enum: ['active', 'inactive'] })
   status: 'active' | 'inactive';
 
-  @OneToOne(() => RestaurantEntity, (restaurant) => restaurant.manager, {
+  @OneToMany(() => RestaurantEntity, (restaurant) => restaurant.manager, {
     cascade: true,
   })
   @JoinColumn()
-  restaurant: RestaurantEntity;
+  restaurants: RestaurantEntity[];
 
   @ManyToOne(() => SubscriptionEntity, (subscription) => subscription.managers)
   subscription: SubscriptionEntity;

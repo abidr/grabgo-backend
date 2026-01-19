@@ -6,7 +6,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ManagerDto, ManagerSignInDto } from './managers.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagerEntity } from './managers.entity';
-import { MoreThan, Repository, TypeORMError } from 'typeorm';
+import { Repository, TypeORMError } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SubscriptionEntity } from 'src/subscriptions/subscriptions.entity';
@@ -27,12 +27,8 @@ export class ManagersService {
   async getInactiveManagers(): Promise<ManagerEntity[]> {
     return this.managerRepository.find({ where: { status: 'inactive' } });
   }
-  async getManagersOlderThan(age: number): Promise<ManagerEntity[]> {
-    return this.managerRepository.find({
-      where: {
-        age: MoreThan(age),
-      },
-    });
+  async getProfile(managerId: number): Promise<ManagerEntity> {
+    return this.managerRepository.findOneOrFail({ where: { id: managerId } });
   }
   async getManagerByEmail(email: string): Promise<ManagerEntity | object> {
     const manager = await this.managerRepository.findOne({ where: { email } });
@@ -71,7 +67,8 @@ export class ManagersService {
     const payload = {
       id: manager.id,
       email: manager.email,
-      fullName: manager.fullName,
+      firstName: manager.firstName,
+      lastName: manager.lastName,
       status: manager.status,
     };
     const accessToken = await this.jwtService.signAsync(payload);
@@ -84,18 +81,48 @@ export class ManagersService {
       accessToken,
     };
   }
+  signOut(res: Response): object {
+    res.clearCookie('access_token');
+    return {
+      message: 'Logged out successfully',
+    };
+  }
   async create(data: ManagerDto): Promise<object> {
     try {
       return await this.managerRepository.save(
         this.managerRepository.create({
-          fullName: `${data.firstName} ${data.lastName}`,
+          firstName: data.firstName,
+          lastName: data.lastName,
           email: data.email,
           phoneNumber: data.phoneNumber,
           password: data.password,
           gender: data.gender,
-          age: 20,
+          dateOfBirth: data.dateOfBirth,
         }),
       );
+    } catch (error) {
+      if (error instanceof TypeORMError) {
+        throw new HttpException(error.message, 400);
+      } else {
+        throw new HttpException('Internal Server Error', 500);
+      }
+    }
+  }
+  async updateProfile(data: ManagerDto, managerId: number): Promise<object> {
+    try {
+      await this.managerRepository.update(
+        { id: managerId },
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phoneNumber: data.phoneNumber,
+          gender: data.gender,
+          dateOfBirth: data.dateOfBirth,
+        },
+      );
+      return await this.managerRepository.findOneOrFail({
+        where: { id: managerId },
+      });
     } catch (error) {
       if (error instanceof TypeORMError) {
         throw new HttpException(error.message, 400);
